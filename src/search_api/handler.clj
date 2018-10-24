@@ -10,8 +10,14 @@
     (org.apache.solr.client.solrj.impl XMLResponseParser HttpSolrClient$Builder)
     (org.apache.solr.client.solrj SolrQuery)))
 
+(def solr-host
+  (search-api.config/get-solr-host))
+
+(def solr-core
+  (search-api.config/get-search-core))
+
 (defn solr-client []
-  (let [builder (HttpSolrClient$Builder. "http://localhost:8983/solr/cases")
+  (let [builder (HttpSolrClient$Builder. (str solr-host "/" solr-core))
         client (.build builder)
         parser (XMLResponseParser.)]
     (.setParser client parser)
@@ -22,7 +28,7 @@
 
 (defroutes app-routes
            (GET "/" [] (response {:message "Hello Jeff and Vishwas"}))
-           (GET "/search/terms" [searchTerm] (response {:results (map #(select-keys % ["title" "date"]) (.getResults (solr-query searchTerm)))}))
+           (GET "/search" [q] (response {:results (map #(select-keys % ["title" "date"]) (.getResults (solr-query q)))}))
            (route/not-found "Not Found"))
 
 (def app

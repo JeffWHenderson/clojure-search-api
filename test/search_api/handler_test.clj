@@ -12,6 +12,6 @@
                (:status response) => 404))
        (fact (mock-get "/") => (contains {:status 200
                                           :body   "{\"message\":\"Hello Jeff and Vishwas\"}"}))
-       (fact (mock-get "/search/terms?searchTerm=California") => (contains {:status 200})))
+       (fact (mock-get "/search?q=California") => (contains {:status 200})))
 
 
