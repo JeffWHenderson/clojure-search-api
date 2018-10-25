@@ -8,6 +8,9 @@
        (fact "reads SOLR_HOST from environment"
              (get-solr-host) => "somethings funny"
              (provided (env :solr-host) => "somethings funny"))
-       (fact "reads CORE from the environment"
+       (fact "reads SEARCH_CORE from the environment"
              (get-search-core) => "search core"
-             (provided (env :search-core) => "search core")))
+             (provided (env :search-core) => "search core"))
+       (fact "throws exception when SOLR_HOST is not present"
+             (get-solr-host) => (throws RuntimeException)
+             (get-search-core) => (throws RuntimeException)))

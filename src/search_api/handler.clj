@@ -10,25 +10,26 @@
     (org.apache.solr.client.solrj.impl XMLResponseParser HttpSolrClient$Builder)
     (org.apache.solr.client.solrj SolrQuery)))
 
-(def solr-host
-  (search-api.config/get-solr-host))
-
-(def solr-core
-  (search-api.config/get-search-core))
 
 (defn solr-client []
-  (let [builder (HttpSolrClient$Builder. (str solr-host "/" solr-core))
+  (let [builder (HttpSolrClient$Builder. (str (search-api.config/get-solr-host) "/" (search-api.config/get-search-core)))
         client (.build builder)
         parser (XMLResponseParser.)]
     (.setParser client parser)
     client))
 
 (defn solr-query [term]
-  (.query (solr-client) (SolrQuery. term)))
+  (.getResults (.query (solr-client) (SolrQuery. term))))
+
+(defn filter-result-fields [result]
+  (select-keys result ["title" "date"]))
+
+(defn handle-query [q]
+  (response {:results (map filter-result-fields (solr-query q))}))
 
 (defroutes app-routes
            (GET "/" [] (response {:message "Hello Jeff and Vishwas"}))
-           (GET "/search" [q] (response {:results (map #(select-keys % ["title" "date"]) (.getResults (solr-query q)))}))
+           (GET "/search" [q] (handle-query q))
            (route/not-found "Not Found"))
 
 (def app

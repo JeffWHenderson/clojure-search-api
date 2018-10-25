@@ -12,6 +12,12 @@
                (:status response) => 404))
        (fact (mock-get "/") => (contains {:status 200
                                           :body   "{\"message\":\"Hello Jeff and Vishwas\"}"}))
-       (fact (mock-get "/search?q=California") => (contains {:status 200})))
+       (fact (mock-get "/search?q=California") => (contains {:status 200})
+             (provided (solr-query "California") => []))
+       (fact (mock-get "/search?q=California") => (contains {:body "{\"results\":[{\"title\":\"Something great\",\"date\":\"Today\"}]}"})
+             (provided (solr-query "California") => [{"title" "Something great"
+                                                      "date"  "Today"}]))
+       (fact (mock-get "/search?q=California") => (contains {:status 567})
+             (provided (handle-query "California") => {:status 567})))
 
 
